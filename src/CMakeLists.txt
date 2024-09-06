@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.18)
 # Create the project
 project(main)
 
-# Include the RadioLib directory from home
-include_directories("/home/EE456/RadioLib/src")
+# Include the RadioLib directory
+include_directories("../RadioLib/src")
 
 # Add the executables
 add_executable(lora_rx lora_rx.cpp)
@@ -26,8 +26,8 @@ target_link_libraries(fsk_tx ${WIRINGPI_LIB})
 target_link_libraries(fsk_rx ${WIRINGPI_LIB})
 
 
-# Include all RadioLib source files from home directory
-file(GLOB_RECURSE RADIO_LIB_SOURCES "/home/EE456/RadioLib/src/*.cpp")
+# Include all RadioLib source files
+file(GLOB_RECURSE RADIO_LIB_SOURCES "../RadioLib/src/*.cpp")
 target_sources(lora_rx PRIVATE ${RADIO_LIB_SOURCES})
 target_sources(lora_tx PRIVATE ${RADIO_LIB_SOURCES})
 target_sources(fsk_tx PRIVATE ${RADIO_LIB_SOURCES})
