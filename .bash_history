@@ -212,3 +212,48 @@ sudo ./rxLoratest
 make
 sudo ./rxLoratest 
 sudo reboot
+ls
+cd src
+cd ..
+cd build
+cmake ../src
+make
+ls
+cmake ../src
+make
+ls
+cmake ../src
+make
+ls
+cmake ../src
+make
+cd
+ls
+git init
+git remote add origin https://github.com/BenDuval/EE456.git
+git add .
+git commit -m "Initial commit of EE456 Project"
+git config --global user.email "ben.duval@ymail.com"
+git config --global user.name "BenDuval"
+git commit -m "Initial commit of EE456 Project"
+git push origin main
+git branch
+git push origin master
+git push --set-upstream origin main
+git push origin master
+ls
+cd src
+ls
+sudo poweroff
+ls
+cd src
+ls
+..
+cd ..
+ls
+cd build
+ls
+sudo ./lora_rx
+ls
+sudo ./lora_rx
+sudo poweroff

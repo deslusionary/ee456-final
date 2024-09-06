@@ -1,72 +1,62 @@
 #include <RadioLib.h>
-#include <fstream>
-#include <vector>
-#include <iostream>
 #include "PiHal.h"
-#include <termios.h>
-#include <unistd.h>
+#include <chrono> // For timestamping
 
 // Create a new instance of the HAL class
-PiHal* hal = new PiHal(0);
+PiHal* hal = new PiHal(0); // 0 for SPI 0 , set to 1 if using SPI 1(this will change NSS pinout)
 
-// Create the radio module instance
-// Pinout corresponds to your SX1262 setup
-// NSS pin: WiringPi 10 (GPIO 8)
-// DIO1 pin: WiringPi 2 (GPIO 27)
-// NRST pin: WiringPi 21 (GPIO 5)
-// BUSY pin: WiringPi 0 (GPIO 17)
-Module* module = new Module(hal, 10, 2, 21, 0);
-SX1262 radio(module);
+// Create the radio module instance/////////////////////////
+// Pinout *****MBED SHIELD****************PI HAT************
+// NSS pin:  WPI# 10 (GPIO 8)  WPI # 29 (GPIO 21) for Pi hat
+// DIO1 pin: WPI# 2  (GPIO 27) WPI # 27 (GPIO 16) for Pi hat
+// NRST pin: WPI# 21 (GPIO 5)  WPI # 1  (GPIO 18) for Pi hat
+// BUSY pin: WPI# 0  (GPIO 17) WPI # 28 (GPIO 20) for Pi hat
+////////////////////////////////////////////////////////////
+
+// Radio initialization based on Pi Hat wiring
+// change for MBED Shield use
+// According to SX1262 radio = new Module(hal, NSS,DI01,NRST,BUSY)
+SX1262 radio = new Module(hal, 29, 27, 1, 28);
+
 
 int main() {
-  // Set test parameters
-  float BW = 125.0; // Bandwidth
-  int SF = 7;       // Spreading Factor
-  int CR = 5;       // Coding Rate
+    // Initialize the radio module
+    printf("[SX1262] Initializing ... ");
+    int state = radio.begin(915.0, 62.5, 7, 5, RADIOLIB_SX126X_SYNC_WORD_PRIVATE, 10, 8, 0.0, false);
+    if (state != RADIOLIB_ERR_NONE) {
+        printf("Initialization failed, code %d\n", state);
+        return 1;
+    }
+    printf("Initialization success!\n");
 
-  int state;
+    int count = 0;
 
-  // Open the file in binary mode
-  std::ifstream file("msg.txt", std::ios::binary);
+    while (true) {
+        // Get the current time 
+        auto now = std::chrono::high_resolution_clock::now();
+        auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 
-  // Make sure file opening worked
-  if (!file.is_open()) {
-    printf("Failed to open file!\n");
-    return 1;
-  }
+        // Print timestamp and packet number
+        printf("[SX1262] Transmitting packet #%d at time %lld ms ... ", count, timestamp);
 
-  // Read the entire file into a vector of bytes
-  std::vector<uint8_t> fileData((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-  file.close();
+        // Create a packet with the timestamp and message
+        char str[64];
+        sprintf(str, "Timestamp: %lld, Hello World! #%d", timestamp, count++);
 
-  // Initialize radio with the set parameters
-  state = radio.begin(915.0, BW, SF, CR, 10, 8, 0.0, false);
-  if (state != RADIOLIB_ERR_NONE) {
-    printf("Initialization failed, code %d\n", state);
-    return 1;
-  }
+        // Send the packet
+        state = radio.transmit(str);
+        if (state == RADIOLIB_ERR_NONE) {
+            printf("success!\n");
 
-  // Packetize and transmit the file data
-  size_t packetSize = 255;  // Maximum packet size
-  size_t totalPackets = (fileData.size() + packetSize - 1) / packetSize;  // Calculate the number of packets required
+            // Get and print the effective data rate for the transmitted packet
+            float effectiveDataRate = radio.getDataRate();
+            printf("Effective Data Rate: %.2f bps\n", effectiveDataRate);
+        } else {
+            printf("failed, code %d\n", state);
+        }
 
-  for (size_t i = 0; i < totalPackets; ++i) {
-    size_t startIdx = i * packetSize;
-    size_t endIdx = std::min(startIdx + packetSize, fileData.size());
-    
-    // Create a packet from the slice of the file data
-    std::vector<uint8_t> packet(fileData.begin() + startIdx, fileData.begin() + endIdx);
-
-    // Transmit the packet
-    state = radio.transmit(packet.data(), packet.size());
-    if (state == RADIOLIB_ERR_NONE) {
-      printf("Packet %lu/%lu Transmission success!\n", i + 1, totalPackets);
-    } else {
-      printf("Packet %lu/%lu Transmission failed, code %d\n", i + 1, totalPackets, state);
+        hal->delay(1000); // delay 1 second
     }
 
-    hal->delay(1000); // 1 second delay before transmitting the next packet
-  }
-
-  return 0;
+    return 0;
 }
