@@ -22,16 +22,23 @@ Reboot your Raspberry Pi.
 `git clone https://github.com/BenDuval/EE456.git`  
 Navigate into the 'EE456' directory.  
 
-2. Navigate to 'RadioLib/examples/NonAudrino/Raspberry/'  
+2. Navigate to 'WiringPi' directory:  
+Run:  
+`./build`  
+  
+Navigate to 'RadioLib/examples/NonAudrino/Raspberry/'  
 Run:  
 `mkdir build`  
 `cd build`  
 `cmake ..`  
 `make`  
 
-3. Navigate to 'WiringPi' directory:  
+3. Navigate to 'RadioLib/examples/NonAudrino/Raspberry/'  
 Run:  
-`./build`  
+`mkdir build`  
+`cd build`  
+`cmake ..`  
+`make`    
 
 4. Build the Project:  
 Navigate to the `src` directory:  
