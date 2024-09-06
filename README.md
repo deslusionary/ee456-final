@@ -16,16 +16,28 @@ Reboot your Raspberry Pi.
 
 ## Installation Instructions
 
+--Run  sudo apt update && sudo apt install -y cmake git
+
+
 1. Clone the GitHub Repository for EE456: 
 `git clone https://github.com/BenDuval/EE456.git`
-2. Clone RadioLib in Your Home Directory: 
-`git clone https://github.com/jgromes/RadioLib.git ~/RadioLib`
-3. Clone WiringPi in Your Home Directory: 
-`git clone https://github.com/WiringPi/WiringPi.git ~/WiringPi`
-4. Build the Project: 
-Navigate to the `src` directory and run the following commands: 
-`cd ~/EE456-Project/src/` 
-then `cmake ..` then `make`
+-- Navigate into the 'EE456' directory.
+3. Navigate to 'RadioLib/examples/NonAudrino/Raspberry/'
+-- run
+   mkdir build
+   cd build
+   cmake ..
+   make
+4. Navigate to 'WiringPi' directory:
+-- run
+   ./build 
+6. Build the Project: 
+Navigate to the `src` directory: 
+`cd ~/EE456/src/` 
+--run
+ cmake ../src   ***cmake must be ran after any changes to CMakeLists.txt (such as adding a new executable!)
+then run
+make         **** make must be ran after all changes to .cpp files**
 
 ## Wiring Diagram for WiringPi Library & SX1262 MBED Shield
 - NSS: GPIO 8, WPI# 10  
