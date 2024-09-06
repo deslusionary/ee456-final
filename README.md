@@ -35,8 +35,8 @@ Run:
 `make`    
 
 4. Build the Project:  
-Navigate to the `src` directory:  
-`cd ~/EE456/src/`  
+Navigate to the `build` directory:  
+`cd ~/EE456/build/`  
 Run:  
 `cmake ../src`  **(cmake must be ran after any changes to CMakeLists.txt such as adding a new executable!)**  
 Then run:  
