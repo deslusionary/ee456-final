@@ -62,12 +62,12 @@ Ensure your wiring matches the above configuration for proper operation with the
 ## Running the Examples  
 
 1. **Transmit Example**:  
-Run the `LoRaTX.cpp` example to confirm transmission without errors using:  
-`sudo ./LoRaTX`  
+Run the `lora_tx.cpp` example to confirm transmission without errors using:  
+`sudo ./lora_rx`  
 
 2. **Receive Example**:  
-Run the `LoRaRX.cpp` example to confirm initialization without any errors using:  
-`sudo ./LoRaRX`  
+Run the `lora_rx.cpp` example to confirm initialization without any errors using:  
+`sudo ./lora_rx`  
 Check for errors and verify successful reception.  
 
 ## Additional Resources  
