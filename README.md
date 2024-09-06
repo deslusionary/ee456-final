@@ -17,8 +17,6 @@ Reboot your Raspberry Pi.
 ## Installation Instructions
 
 --Run  sudo apt update && sudo apt install -y cmake git
-
-
 1. Clone the GitHub Repository for EE456:
 
 `git clone https://github.com/BenDuval/EE456.git`
