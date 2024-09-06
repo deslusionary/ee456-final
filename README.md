@@ -26,12 +26,6 @@ Navigate into the 'EE456' directory.
 Run:  
 `./build`  
   
-Navigate to 'RadioLib/examples/NonAudrino/Raspberry/'  
-Run:  
-`mkdir build`  
-`cd build`  
-`cmake ..`  
-`make`  
 
 3. Navigate to 'RadioLib/examples/NonAudrino/Raspberry/'  
 Run:  
