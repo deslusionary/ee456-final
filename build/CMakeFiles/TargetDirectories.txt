@@ -1,6 +1,0 @@
-/home/EE456/build/CMakeFiles/rebuild_cache.dir
-/home/EE456/build/CMakeFiles/fsk_rx.dir
-/home/EE456/build/CMakeFiles/fsk_tx.dir
-/home/EE456/build/CMakeFiles/lora_tx.dir
-/home/EE456/build/CMakeFiles/edit_cache.dir
-/home/EE456/build/CMakeFiles/lora_rx.dir
