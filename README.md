@@ -35,8 +35,7 @@ Run:
 `make`    
 
 4. Make and build the Project:
-
-From EE456 directory,
+From EE456 directory run:
 'mkdir build'
 Navigate to the `build` directory:  
 `cd build`  
