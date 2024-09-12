@@ -34,9 +34,11 @@ Run:
 `cmake ..`  
 `make`    
 
-4. Build the Project:  
+4. Make and build the Project:
+From EE456 directory,
+'mkdir build'
 Navigate to the `build` directory:  
-`cd ~/EE456/build/`  
+`cd build`  
 Run:  
 `cmake ../src`  **(cmake must be ran after any changes to CMakeLists.txt such as adding a new executable!)**  
 Then run:  
