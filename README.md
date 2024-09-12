@@ -34,10 +34,10 @@ Run:
 `cmake ..`  
 `make`    
 
-4. Make and build the Project:
-From EE456 directory run:
-'mkdir build'
-Navigate to the `build` directory:  
+4. Make and build the Project:  
+From EE456 directory run:  
+'mkdir build'  
+Navigate to the `build` directory:    
 `cd build`  
 Run:  
 `cmake ../src`  **(cmake must be ran after any changes to CMakeLists.txt such as adding a new executable!)**  
