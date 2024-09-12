@@ -35,6 +35,7 @@ Run:
 `make`    
 
 4. Make and build the Project:
+
 From EE456 directory,
 'mkdir build'
 Navigate to the `build` directory:  
