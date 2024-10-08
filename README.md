@@ -50,8 +50,8 @@ Then run:
 - Reset: GPIO 5, WPI# 21  
 - DI01: GPIO 27, WPI# 2  
 - Busy: GPIO 17, WPI# 0  
-- Pwr: GPIO , WPI#
-- Gnd: GPIO , WPI#
+- Pwr: Pin 1 3.3V   
+- Gnd: Pick one   
   
 Ensure your wiring matches the above configuration for proper operation with the RPI and MBED shield.  
 
