@@ -2,6 +2,14 @@
 #include <RadioLib.h>
 #include "PiHal.h"
 #include <cstdio>
+#include <sys/socket.h> // For socket functions
+#include <arpa/inet.h>  // For inet_pton()
+#include <unistd.h>     // For close()
+#include <cstring>      // For strlen()
+
+using namespace std;
+
+#define PORT 8080
 
 // Create a new instance of the HAL class
 PiHal* hal = new PiHal(0); // 0 for SPI 0 , set to 1 if using SPI 1(this will change NSS pinout)
@@ -69,6 +77,47 @@ int main(int argc, char** argv) {
         printf("Read failed, code %d\n", state);
       } else {
         printf("Data: %s\n", (char*)buff);
+
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
+    	  if (sock < 0) {
+          perror("Socket creation error");
+          return -1;
+          }
+
+        cout << "Socket created successfully." << endl;
+
+        struct sockaddr_in serv_addr;
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_port = htons(PORT);
+
+        // Convert IPv4 address from text to binary
+        if (inet_pton(AF_INET, "10.144.82.43", &serv_addr.sin_addr) <= 0) {
+            perror("Invalid address / Address not supported");
+            return -1;
+        }
+
+        if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+            perror("Connection failed");
+            return -1;
+        }
+
+        cout << "Connected to the server." << endl;
+
+        // Sending message to the server
+        const char *hello = "Hello from client";
+        send(sock, buff, len, 0);
+        cout << "Hello message sent." << endl;
+
+        // Receiving message from the server
+        char buffer[1024] = {0};
+        read(sock, buffer, 1024);
+        cout << "Message from server: " << buffer << endl;
+
+        close(sock);
+        return 0;	
+
+
+
       }
     }
   }
