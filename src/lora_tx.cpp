@@ -1,23 +1,56 @@
+#include <iostream>
+#include <string>
+#include <fcntl.h>
+#include <unistd.h>
+#include <termios.h>
+#include <sstream>
 #include <RadioLib.h>
 #include "PiHal.h"
-#include <chrono> // For timestamping
 
 // Create a new instance of the HAL class
-PiHal* hal = new PiHal(0); // 0 for SPI 0 , set to 1 if using SPI 1(this will change NSS pinout)
-
-// Create the radio module instance/////////////////////////
-// Pinout *****MBED SHIELD****************PI HAT************
-// NSS pin:  WPI# 10 (GPIO 8)  WPI # 29 (GPIO 21) for Pi hat
-// DIO1 pin: WPI# 2  (GPIO 27) WPI # 27 (GPIO 16) for Pi hat
-// NRST pin: WPI# 21 (GPIO 5)  WPI # 1  (GPIO 18) for Pi hat
-// BUSY pin: WPI# 0  (GPIO 17) WPI # 28 (GPIO 20) for Pi hat
-////////////////////////////////////////////////////////////
+PiHal* hal = new PiHal(0); // 0 for SPI 0
 
 // Radio initialization based on Pi Hat wiring
-// change for MBED Shield use
-// According to SX1262 radio = new Module(hal, NSS,DI01,NRST,BUSY)
 SX1262 radio = new Module(hal, 29, 27, 1, 28);
 
+void parseNMEA(const std::string &line) {
+    if (line.rfind("$GNGGA", 0) == 0) {  // Check if line starts with $GNGGA
+        std::istringstream ss(line);
+        std::string token;
+        int index = 0;
+        std::string latitude, longitude, lat_dir, lon_dir;
+
+        while (std::getline(ss, token, ',')) {
+            if (index == 2) latitude = token;        // Latitude
+            else if (index == 3) lat_dir = token;    // Latitude Direction
+            else if (index == 4) longitude = token;  // Longitude
+            else if (index == 5) lon_dir = token;    // Longitude Direction
+            index++;
+        }
+
+        if (!latitude.empty() && !longitude.empty()) {
+            // Create a formatted GPS data packet in a char array
+            char gps_data[256];
+            snprintf(gps_data, sizeof(gps_data), "Lat: %s %s, Lon: %s %s", 
+                     latitude.c_str(), lat_dir.c_str(), longitude.c_str(), lon_dir.c_str());
+
+            // Transmit the GPS data packet
+            int state = radio.transmit(gps_data);
+            if (state == RADIOLIB_ERR_NONE) {
+                printf("Transmission success!\n");
+
+                // Get and print the effective data rate for the transmitted packet
+                float effectiveDataRate = radio.getDataRate();
+                printf("Effective Data Rate: %.2f bps\n", effectiveDataRate);
+            } else {
+                printf("Transmission failed, code %d\n", state);
+            }
+
+            std::cout << "Latitude: " << latitude << " " << lat_dir
+                      << ", Longitude: " << longitude << " " << lon_dir << std::endl;
+        }
+    }
+}
 
 int main() {
     // Initialize the radio module
@@ -29,34 +62,34 @@ int main() {
     }
     printf("Initialization success!\n");
 
-    int count = 0;
-
-    while (true) {
-        // Get the current time 
-        auto now = std::chrono::high_resolution_clock::now();
-        auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-
-        // Print timestamp and packet number
-        printf("[SX1262] Transmitting packet #%d at time %lld ms ... ", count, timestamp);
-
-        // Create a packet with the timestamp and message
-        char str[64];
-        sprintf(str, "Timestamp: %lld, Hello World! #%d", timestamp, count++);
-
-        // Send the packet
-        state = radio.transmit(str);
-        if (state == RADIOLIB_ERR_NONE) {
-            printf("success!\n");
-
-            // Get and print the effective data rate for the transmitted packet
-            float effectiveDataRate = radio.getDataRate();
-            printf("Effective Data Rate: %.2f bps\n", effectiveDataRate);
-        } else {
-            printf("failed, code %d\n", state);
-        }
-
-        hal->delay(1000); // delay 1 second
+    // Open the serial port for GNSS data
+    int serial_port = open("/dev/serial0", O_RDWR | O_NOCTTY);
+    if (serial_port < 0) {
+        std::cerr << "Error opening serial port\n";
+        return 1;
     }
 
+    struct termios tty;
+    tcgetattr(serial_port, &tty);
+    tty.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+    tty.c_iflag = IGNPAR;
+    tcsetattr(serial_port, TCSANOW, &tty);
+
+    std::string buffer;
+    char c;
+    while (true) {
+        // Read one character at a time
+        if (read(serial_port, &c, 1) > 0) {
+            if (c == '\n') {  // End of line detected
+                parseNMEA(buffer);  // Parse the complete line
+                buffer.clear();     // Clear the buffer for the next line
+            } else {
+                buffer += c;  // Append character to buffer
+            }
+        }
+    }
+
+    close(serial_port);
     return 0;
 }
+
