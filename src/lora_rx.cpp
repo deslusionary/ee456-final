@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define PORT 8080
+#define PORT 36000 
 
 // Create a new instance of the HAL class
 PiHal* hal = new PiHal(0); // 0 for SPI 0 , set to 1 if using SPI 1(this will change NSS pinout)
